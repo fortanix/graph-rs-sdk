@@ -7,6 +7,7 @@ extern crate strum;
 extern crate serde;
 
 pub mod cache;
+#[cfg(not(target_env = "sgx"))]
 pub mod crypto;
 pub mod http;
 pub mod identity;

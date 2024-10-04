@@ -38,11 +38,13 @@ use crate::group_lifecycle_policies::{
     GroupLifecyclePoliciesApiClient, GroupLifecyclePoliciesIdApiClient,
 };
 use crate::groups::{GroupsApiClient, GroupsIdApiClient};
+use crate::identity::bearer_token_credential::BearerTokenCredential;
+use crate::identity::{AllowedHostValidator, HostIs};
+#[cfg(not(target_env = "sgx"))]
 use crate::identity::{
-    AllowedHostValidator, AuthorizationCodeAssertionCredential,
-    AuthorizationCodeCertificateCredential, AuthorizationCodeCredential, BearerTokenCredential,
-    ClientAssertionCredential, ClientCertificateCredential, ClientSecretCredential,
-    ConfidentialClientApplication, DeviceCodeCredential, HostIs, OpenIdCredential,
+    AuthorizationCodeAssertionCredential, AuthorizationCodeCertificateCredential,
+    AuthorizationCodeCredential, ClientAssertionCredential, ClientCertificateCredential,
+    ClientSecretCredential, ConfidentialClientApplication, DeviceCodeCredential, OpenIdCredential,
     PublicClientApplication, ResourceOwnerPasswordCredential, Token,
 };
 use crate::identity_access::IdentityApiClient;
@@ -556,6 +558,7 @@ impl From<String> for GraphClient {
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<&Token> for GraphClient {
     fn from(token: &Token) -> Self {
         GraphClient::from_client_app(BearerTokenCredential::from(token.access_token.clone()))
@@ -572,54 +575,63 @@ impl From<GraphClientConfiguration> for GraphClient {
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<&ConfidentialClientApplication<AuthorizationCodeCredential>> for GraphClient {
     fn from(value: &ConfidentialClientApplication<AuthorizationCodeCredential>) -> Self {
         GraphClient::from_client_app(value.clone())
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<&ConfidentialClientApplication<AuthorizationCodeAssertionCredential>> for GraphClient {
     fn from(value: &ConfidentialClientApplication<AuthorizationCodeAssertionCredential>) -> Self {
         GraphClient::from_client_app(value.clone())
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<&ConfidentialClientApplication<AuthorizationCodeCertificateCredential>> for GraphClient {
     fn from(value: &ConfidentialClientApplication<AuthorizationCodeCertificateCredential>) -> Self {
         GraphClient::from_client_app(value.clone())
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<&ConfidentialClientApplication<ClientSecretCredential>> for GraphClient {
     fn from(value: &ConfidentialClientApplication<ClientSecretCredential>) -> Self {
         GraphClient::from_client_app(value.clone())
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<&ConfidentialClientApplication<ClientCertificateCredential>> for GraphClient {
     fn from(value: &ConfidentialClientApplication<ClientCertificateCredential>) -> Self {
         GraphClient::from_client_app(value.clone())
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<&ConfidentialClientApplication<ClientAssertionCredential>> for GraphClient {
     fn from(value: &ConfidentialClientApplication<ClientAssertionCredential>) -> Self {
         GraphClient::from_client_app(value.clone())
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<&ConfidentialClientApplication<OpenIdCredential>> for GraphClient {
     fn from(value: &ConfidentialClientApplication<OpenIdCredential>) -> Self {
         GraphClient::from_client_app(value.clone())
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<&PublicClientApplication<DeviceCodeCredential>> for GraphClient {
     fn from(value: &PublicClientApplication<DeviceCodeCredential>) -> Self {
         GraphClient::from_client_app(value.clone())
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<&PublicClientApplication<ResourceOwnerPasswordCredential>> for GraphClient {
     fn from(value: &PublicClientApplication<ResourceOwnerPasswordCredential>) -> Self {
         GraphClient::from_client_app(value.clone())

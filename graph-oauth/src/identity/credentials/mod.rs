@@ -5,7 +5,6 @@ pub use auth_code_authorization_url::*;
 pub use authorization_code_assertion_credential::*;
 pub use authorization_code_certificate_credential::*;
 pub use authorization_code_credential::*;
-pub use bearer_token_credential::*;
 pub use client_assertion_credential::*;
 
 pub use client_certificate_credential::*;
@@ -37,7 +36,6 @@ mod auth_code_authorization_url;
 mod authorization_code_assertion_credential;
 mod authorization_code_certificate_credential;
 mod authorization_code_credential;
-mod bearer_token_credential;
 mod client_assertion_credential;
 mod client_certificate_credential;
 mod client_credentials_authorization_url;

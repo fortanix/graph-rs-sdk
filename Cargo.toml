@@ -52,7 +52,7 @@ graph-core = { path = "./graph-core", version = "2.0.1", default-features=false 
 [features]
 default = ["native-tls"]
 native-tls = ["reqwest/native-tls", "graph-http/native-tls", "graph-oauth/native-tls", "graph-core/native-tls"]
-rustls-tls = ["reqwest/rustls-tls", "graph-http/rustls-tls", "graph-oauth/rustls-tls", "graph-core/rustls-tls"]
+rustls-tls = ["reqwest/rustls-tls-manual-roots-no-provider", "graph-http/rustls-tls", "graph-oauth/rustls-tls", "graph-core/rustls-tls"]
 brotli = ["reqwest/brotli", "graph-http/brotli", "graph-oauth/brotli", "graph-core/brotli"]
 deflate = ["reqwest/deflate", "graph-http/deflate", "graph-oauth/deflate", "graph-core/deflate"]
 trust-dns = ["reqwest/trust-dns", "graph-http/trust-dns", "graph-oauth/trust-dns", "graph-core/trust-dns"]
@@ -64,13 +64,14 @@ test-util = ["graph-http/test-util"]
 [workspace.dependencies]
 reqwest = { version = "0.12", default-features = false}
 http = { version = "1", default-features = false }
+tokio = { version = "1.25.0", features = ["io-std", "net", "rt-multi-thread", "fs",] }
 
 [dev-dependencies]
 bytes = { version = "1.4.0" }
 futures = "0.3"
 http = { workspace = true }
 lazy_static = "1.4"
-tokio = { version = "1.27.0", features = ["full"] }
+tokio = { workspace = true }
 warp = { version = "0.3.5" }
 webbrowser = "0.8.7"
 anyhow = "1.0.69"
@@ -95,3 +96,8 @@ required-features = ["interactive-auth", "openssl"]
 name = "interactive_auth"
 path = "examples/interactive_auth/main.rs"
 required-features = ["interactive-auth"]
+
+[patch.crates-io]
+mio = { git = "https://github.com/fortanix/mio.git", branch = "v0.8.11" }
+tokio = { git = "https://github.com/fortanix/tokio.git", branch = "tokio-1.36.0-sgx" }
+hyper-util = { git = "https://github.com/fortanix/hyper-util.git", branch = "v0.1.9-sgx" }

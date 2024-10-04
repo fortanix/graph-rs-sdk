@@ -21,7 +21,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_urlencoded = "0.7.1"
 thiserror = "1"
-tokio = { version = "1.27.0", features = ["full", "tracing"] }
+tokio = { workspace = true, features = ["tracing"] }
 url = { version = "2", features = ["serde"] }
 
 graph-error = { path = "../graph-error"  }
@@ -30,7 +30,7 @@ graph-core = { path = "../graph-core", default-features = false }
 [features]
 default = ["native-tls"]
 native-tls = ["reqwest/native-tls", "graph-core/native-tls"]
-rustls-tls = ["reqwest/rustls-tls", "graph-core/rustls-tls"]
+rustls-tls = ["reqwest/rustls-tls-manual-roots-no-provider", "graph-core/rustls-tls"]
 brotli = ["reqwest/brotli", "graph-core/brotli"]
 deflate = ["reqwest/deflate", "graph-core/deflate"]
 trust-dns = ["reqwest/trust-dns", "graph-core/trust-dns"]

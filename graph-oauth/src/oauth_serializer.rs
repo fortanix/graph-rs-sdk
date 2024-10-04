@@ -6,10 +6,10 @@ use std::fmt::Display;
 
 use url::form_urlencoded::Serializer;
 
-use graph_error::{AuthorizationFailure, IdentityResult};
-
+#[cfg(not(target_env = "sgx"))]
 use crate::identity::{AsQuery, Prompt, ResponseType};
 use crate::strum::IntoEnumIterator;
+use graph_error::{AuthorizationFailure, IdentityResult};
 
 /// Fields that represent common OAuth credentials.
 #[derive(
@@ -325,6 +325,7 @@ impl AuthSerializer {
         self.insert(AuthParameter::ResponseType, value)
     }
 
+    #[cfg(not(target_env = "sgx"))]
     pub fn response_types(
         &mut self,
         value: std::collections::btree_set::Iter<'_, ResponseType>,
@@ -358,6 +359,7 @@ impl AuthSerializer {
         self.insert(AuthParameter::Prompt, value)
     }
 
+    #[cfg(not(target_env = "sgx"))]
     pub fn prompts(&mut self, value: &[Prompt]) -> &mut AuthSerializer {
         self.insert(AuthParameter::Prompt, value.to_vec().as_query())
     }
