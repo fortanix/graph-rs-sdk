@@ -9,6 +9,8 @@ use std::ffi::OsStr;
 use std::fmt::{Debug, Formatter};
 use std::time::Duration;
 
+pub use reqwest::Certificate;
+
 fn user_agent_header_from_env() -> Option<HeaderValue> {
     let header = std::option_env!("GRAPH_CLIENT_USER_AGENT")?;
     HeaderValue::from_str(header).ok()
@@ -26,6 +28,7 @@ struct ClientConfiguration {
     /// TLS 1.2 required to support all features in Microsoft Graph
     /// See [Reliability and Support](https://learn.microsoft.com/en-us/graph/best-practices-concept#reliability-and-support)
     min_tls_version: Version,
+    root_certificate: Vec<Certificate>,
     proxy: Option<Proxy>,
 }
 
@@ -48,6 +51,7 @@ impl ClientConfiguration {
             https_only: true,
             min_tls_version: Version::TLS_1_2,
             proxy: None,
+            root_certificate: Vec::new(),
         }
     }
 }
@@ -92,6 +96,11 @@ impl GraphClientConfiguration {
         for (key, value) in headers.iter() {
             self.config.headers.insert(key, value.clone());
         }
+        self
+    }
+
+    pub fn with_root_certificate(mut self, certs: Vec<Certificate>) -> GraphClientConfiguration {
+        self.config.root_certificate = certs;
         self
     }
 
@@ -175,6 +184,10 @@ impl GraphClientConfiguration {
             .redirect(Policy::limited(2))
             .default_headers(self.config.headers);
 
+        for cert in self.config.root_certificate {
+            builder = builder.add_root_certificate(cert);
+        }
+
         if let Some(timeout) = self.config.timeout {
             builder = builder.timeout(timeout);
         }
@@ -213,6 +226,10 @@ impl GraphClientConfiguration {
             .min_tls_version(self.config.min_tls_version)
             .redirect(Policy::limited(2))
             .default_headers(self.config.headers);
+
+        for cert in self.config.root_certificate {
+            builder = builder.add_root_certificate(cert);
+        }
 
         if let Some(timeout) = self.config.timeout {
             builder = builder.timeout(timeout);
