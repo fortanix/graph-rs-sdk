@@ -1,3 +1,4 @@
+#[cfg(not(target_env = "sgx"))]
 use jsonwebtoken::TokenData;
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
@@ -45,6 +46,7 @@ impl Display for JwtHeader {
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 pub type DecodedJwt = TokenData<Claims>;
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]

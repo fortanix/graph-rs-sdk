@@ -62,5 +62,7 @@ pub mod extensions {
 }
 
 pub use crate::identity::*;
+#[cfg(not(target_env = "sgx"))]
 pub use graph_core::{crypto::GenPkce, crypto::ProofKeyCodeExchange};
+#[cfg(not(target_env = "sgx"))]
 pub use jsonwebtoken::{Header, TokenData};

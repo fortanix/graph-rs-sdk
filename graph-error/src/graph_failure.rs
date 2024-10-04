@@ -89,6 +89,7 @@ pub enum GraphFailure {
         response: http::Response<Result<serde_json::Value, ErrorMessage>>,
     },
 
+    #[cfg(not(target_env = "sgx"))]
     #[error("{0:#?}")]
     JsonWebToken(#[from] jsonwebtoken::errors::Error),
 
@@ -168,6 +169,7 @@ impl From<AuthExecutionError> for GraphFailure {
             AuthExecutionError::SilentTokenAuth { message, response } => {
                 GraphFailure::SilentTokenAuth { message, response }
             }
+            #[cfg(not(target_env = "sgx"))]
             AuthExecutionError::JsonWebToken(error) => GraphFailure::JsonWebToken(error),
             AuthExecutionError::Other(e) => GraphFailure::Other(e),
         }

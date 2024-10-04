@@ -109,6 +109,7 @@ pub enum AuthExecutionError {
         response: http::Response<Result<serde_json::Value, ErrorMessage>>,
     },
 
+    #[cfg(not(target_env = "sgx"))]
     #[error("{0:#?}")]
     JsonWebToken(#[from] jsonwebtoken::errors::Error),
 
