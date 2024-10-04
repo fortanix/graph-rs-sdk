@@ -14,6 +14,8 @@ use tower::retry::RetryLayer;
 use tower::util::BoxCloneService;
 use tower::ServiceExt;
 
+pub use reqwest::Certificate;
+
 fn user_agent_header_from_env() -> Option<HeaderValue> {
     let header = std::option_env!("GRAPH_CLIENT_USER_AGENT")?;
     HeaderValue::from_str(header).ok()
@@ -38,6 +40,7 @@ struct ClientConfiguration {
     /// TLS 1.2 required to support all features in Microsoft Graph
     /// See [Reliability and Support](https://learn.microsoft.com/en-us/graph/best-practices-concept#reliability-and-support)
     min_tls_version: Version,
+    root_certificate: Vec<Certificate>,
     service_layers_configuration: ServiceLayersConfiguration,
     proxy: Option<Proxy>,
 }
@@ -62,6 +65,7 @@ impl ClientConfiguration {
             min_tls_version: Version::TLS_1_2,
             service_layers_configuration: ServiceLayersConfiguration::default(),
             proxy: None,
+            root_certificate: Vec::new(),
         }
     }
 }
@@ -117,6 +121,11 @@ impl GraphClientConfiguration {
         for (key, value) in headers.iter() {
             self.config.headers.insert(key, value.clone());
         }
+        self
+    }
+
+    pub fn with_root_certificate(mut self, certs: Vec<Certificate>) -> GraphClientConfiguration {
+        self.config.root_certificate = certs;
         self
     }
 
@@ -265,7 +274,7 @@ impl GraphClientConfiguration {
             .boxed_clone()
     }
 
-    fn build_http_client(&self) -> reqwest::Client {
+    fn build_http_client(&mut self) -> reqwest::Client {
         let headers = self.config.headers.clone();
         let mut builder = reqwest::ClientBuilder::new()
             .referer(self.config.referer)
@@ -275,6 +284,10 @@ impl GraphClientConfiguration {
             .redirect(Policy::limited(2))
             .default_headers(headers);
 
+        for cert in std::mem::take(&mut self.config.root_certificate) {
+            builder = builder.add_root_certificate(cert);
+        }
+
         if let Some(timeout) = self.config.timeout {
             builder = builder.timeout(timeout);
         }
@@ -290,7 +303,7 @@ impl GraphClientConfiguration {
         builder.build().unwrap()
     }
 
-    fn build_blocking_http_client(&self) -> reqwest::blocking::Client {
+    fn build_blocking_http_client(&mut self) -> reqwest::blocking::Client {
         let headers = self.config.headers.clone();
         let mut builder = reqwest::blocking::ClientBuilder::new()
             .referer(self.config.referer)
@@ -300,6 +313,10 @@ impl GraphClientConfiguration {
             .redirect(Policy::limited(2))
             .default_headers(headers);
 
+        for cert in std::mem::take(&mut self.config.root_certificate) {
+            builder = builder.add_root_certificate(cert);
+        }
+
         if let Some(timeout) = self.config.timeout {
             builder = builder.timeout(timeout);
         }
@@ -315,7 +332,7 @@ impl GraphClientConfiguration {
         builder.build().unwrap()
     }
 
-    pub(crate) fn build(self) -> Client {
+    pub(crate) fn build(mut self) -> Client {
         let config = self.clone();
         let headers = self.config.headers.clone();
         let client = self.build_http_client();
@@ -337,7 +354,7 @@ impl GraphClientConfiguration {
         }
     }
 
-    pub(crate) fn build_blocking(self) -> BlockingClient {
+    pub(crate) fn build_blocking(mut self) -> BlockingClient {
         let headers = self.config.headers.clone();
         let client = self.build_blocking_http_client();
 
@@ -356,7 +373,7 @@ impl GraphClientConfiguration {
         }
     }
 
-    pub(crate) fn build_minimal_async_client(self) -> MinimalAsyncClient {
+    pub(crate) fn build_minimal_async_client(mut self) -> MinimalAsyncClient {
         let config = self.clone();
         let client = self.build_http_client();
         let service = self.build_tower_service(&client);
