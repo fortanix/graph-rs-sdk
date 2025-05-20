@@ -126,6 +126,7 @@ impl Default for GraphFailure {
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<ring::error::Unspecified> for GraphFailure {
     fn from(_: ring::error::Unspecified) -> Self {
         GraphFailure::CryptoError

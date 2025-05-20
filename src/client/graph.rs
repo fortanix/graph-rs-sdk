@@ -73,6 +73,7 @@ use crate::teamwork::TeamworkApiClient;
 use crate::users::{UsersApiClient, UsersIdApiClient};
 use crate::{GRAPH_URL, GRAPH_URL_BETA};
 use graph_core::identity::ForceTokenRefresh;
+#[cfg(not(target_env = "sgx"))]
 use graph_oauth::AuthorizationCodeSpaCredential;
 use lazy_static::lazy_static;
 
@@ -639,6 +640,7 @@ impl From<&PublicClientApplication<ResourceOwnerPasswordCredential>> for GraphCl
     }
 }
 
+#[cfg(not(target_env = "sgx"))]
 impl From<&PublicClientApplication<AuthorizationCodeSpaCredential>> for GraphClient {
     fn from(value: &PublicClientApplication<AuthorizationCodeSpaCredential>) -> Self {
         GraphClient::from_client_app(value.clone())
